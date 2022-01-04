@@ -2,8 +2,6 @@
  (:require [parcera.core :as parcera]))
 ;;;;;; TODO emplement comma seperation in Maps Sets and Vectors
 
-(def demo-ast (rest (parcera/ast (slurp "/home/soko/usr/src/webhook-integration/.acrolinx-config.edn"))) )
-
 (defn whitespace? [token]
   (some #{:comment :whitespace} token))
 
