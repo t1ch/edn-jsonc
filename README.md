@@ -1,10 +1,10 @@
-# edn-to-jsonc
+# edn-jsonc
 
-FIXME: description
+A library to convert EDN to JSONC and the other way round
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download from http://github.com/t1ch/edn-jsonc
 
 ## Usage
 
@@ -30,7 +30,7 @@ FIXME: listing of options this app accepts.
 
 ## License
 
-Copyright © 2021 FIXME
+Copyright © 2021 Tichaona Kadzinga
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

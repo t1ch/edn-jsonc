@@ -1,6 +1,14 @@
-(ns edn-to-jsonc.core
-  (:require [parcera.core :as parcera]))
+(ns edn-jsonc.core
+ (:require [parcera.core :as parcera]))
 ;;;;;; TODO emplement comma seperation in Maps Sets and Vectors
+
+(def demo-ast (rest (parcera/ast (slurp "/home/soko/usr/src/webhook-integration/.acrolinx-config.edn"))) )
+
+(defn whitespace? [token]
+  (some #{:comment :whitespace} token))
+
+(defn more-keys? [tokens]
+  (>= (count (remove whitespace? tokens)) 2))
 
 (defn  resolve-map  [[token & tokens] state result]
   (if (empty? token)
@@ -20,10 +28,12 @@
         (case (second token)
           " " (resolve-map tokens :look-for-value result)
           (resolve-map tokens state result))
-        (:set :vector :map :string :number :keyword)
+        (:set :vector :map :string :number :keyword :symbol)
         (resolve-map tokens :look-for-more-keys (str result (ast-dispatch (list token)))))
       :look-for-more-keys
-      (resolve-map (cons token tokens) :look-for-key result))))
+      (if (more-keys? tokens)
+        (resolve-map (cons token tokens) :look-for-key (str result ","))
+        (resolve-map (cons token tokens) :look-for-key result)))))
 
 (defn  resolve-vector  [[token & tokens] state result]
   (if (empty? token)
@@ -37,10 +47,13 @@
         (case (second token)
           " " (resolve-vector tokens :look-for-more-elements result)
           (resolve-vector tokens state result))
-        (:set :vector :map :string :number :keyword)
+        (:set :vector :map :string :number :keyword :symbol)
         (resolve-vector tokens :look-for-more-elements (str result (ast-dispatch (list token)))))
       :look-for-more-elements
       (resolve-vector (cons token tokens) :look-for-element result))))
+
+
+
 
 (defn ast-dispatch [[token & rest-tokens]]
   (if (empty? token)
@@ -51,8 +64,10 @@
             (case token-name
               :comment
               (str "\\" token-value)
-              (:whitespace :number :string :keyword)
+              (:whitespace :number :string)
               token-value
+              (:keyword :symbol)
+              (str "\""token-value"\"")
               :map
               (resolve-map (rest token) :start "")
               (:set :vector)
